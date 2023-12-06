@@ -13,7 +13,6 @@ import (
 2. Method (v) -> implementasi dari interface
 3. Function (v) -> constructor (gerbang penghubung)
 */
-
 type TaskRepository interface {
 	List() ([]model.Task, error)
 	Create(payload model.Task) (model.Task, error)
@@ -41,6 +40,7 @@ func (t *taskRepository) List() ([]model.Task, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		tasks = append(tasks, task)
 	}
 	return tasks, nil
@@ -63,7 +63,6 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 	task.Content = payload.Content
 	task.UpdatedAt = payload.UpdatedAt
 	return task, nil
-
 }
 
 func NewTaskRepository(db *sql.DB) TaskRepository {

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"gin/model"
 	"gin/repository"
 	"gin/usecase"
 
@@ -23,41 +24,64 @@ func main() {
 	if err != nil {
 		panic("connection error")
 	}
-	// Inject DB ke dalam repository
-	taskRepo := repository.NewTaskRepository(db)
+
+	// Inject DB ke -> repository
 	authorRepo := repository.NewAuthorRepository(db)
+	taskRepo := repository.NewTaskRepository(db)
+	// Inject REPO ke -> useCase
+	authUC := usecase.NewAuthorUseCase(authorRepo)
+	taskUC := usecase.NewTaskUseCase(taskRepo, authUC)
+
+	// Create Task
+	payload := model.Task{
+		Title:    "CDR",
+		Content:  "",
+		AuthorId: "4a223243-72e4-4bc1-af27-ee2b94d84142",
+	}
+
+	rsv, err := taskUC.RegisterNewTask(payload)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Println("created:", rsv)
+
+	// Inject DB ke dalam repository
+	// taskRepo := repository.NewTaskRepository(db)
+	// authorRepo := repository.NewAuthorRepository(db)
 	// Inject REPO ke dalam usecase
-	taskUC := usecase.NewTaskUseCase(taskRepo)
-	authorUC := usecase.NewAuthorUseCase(authorRepo)
+	// taskUC := usecase.NewTaskUseCase(taskRepo)
+	// authorUC := usecase.NewAuthorUseCase(authorRepo)
 	// Buat router dan inject UC ke dalam controller
 
-	authors, err := authorUC.FindAllAuthor()
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	for _, author := range authors {
-		fmt.Println("List Author:")
-		fmt.Println("ID:", author.ID)
-		fmt.Println("Name:", author.Name)
-		fmt.Println("Email:", author.Email)
-		fmt.Println("CreatedAt:", author.CreatedAt)
-		fmt.Println()
-	}
+	// authors, err := authorUC.FindAllAuthor()
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// 	return
+	// }
+	// for _, author := range authors {
+	// 	fmt.Println("List Author:")
+	// 	fmt.Println("ID:", author.ID)
+	// 	fmt.Println("Name:", author.Name)
+	// 	fmt.Println("Email:", author.Email)
+	// 	fmt.Println("CreatedAt:", author.CreatedAt)
+	// 	fmt.Println()
+	// }
 
-	tasks, err := taskUC.FindAllTask()
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	for _, task := range tasks {
-		fmt.Println("List Task:")
-		fmt.Println("ID:", task.ID)
-		fmt.Println("Title:", task.Title)
-		fmt.Println("Content:", task.Content)
-		fmt.Println("CreatedAt:", task.CreatedAt)
-		fmt.Println()
-	}
+	// tasks, err := taskUC.FindAllTask()
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// 	return
+	// }
+	// for _, task := range tasks {
+	// 	fmt.Println("List Task:")
+	// 	fmt.Println("ID:", task.ID)
+	// 	fmt.Println("Title:", task.Title)
+	// 	fmt.Println("Content:", task.Content)
+	// 	fmt.Println("CreatedAt:", task.CreatedAt)
+	// 	fmt.Println()
+	// }
 
 	// r := gin.New()
 	// r.Use(LogMiddleware())

@@ -11,9 +11,10 @@ type TaskUseCase interface {
 	FindAllTask() ([]model.Task, error)
 	RegisterNewTask(payload model.Task) (model.Task, error)
 }
+
 type taskUseCase struct {
-	repo repository.TaskRepository
-	//authorUC usecase.AuthorUseCase
+	repo     repository.TaskRepository
+	authorUC AuthorUseCase
 }
 
 func (t *taskUseCase) FindAllTask() ([]model.Task, error) {
@@ -21,7 +22,12 @@ func (t *taskUseCase) FindAllTask() ([]model.Task, error) {
 }
 
 func (t *taskUseCase) RegisterNewTask(payload model.Task) (model.Task, error) {
-	//author, err := t.authorUC.FindAuthorById(payload.AuthorId)
+	fmt.Println("payload.AuthorID:", payload.AuthorId)
+	author, err := t.authorUC.FindAuthorByID(payload.AuthorId)
+	fmt.Println("author:", author)
+	if err != nil {
+		return model.Task{}, fmt.Errorf("author with ID %s not found", payload.AuthorId)
+	}
 
 	if payload.Title == "" || payload.Content == "" {
 		return model.Task{}, fmt.Errorf("oppps, required fields")
@@ -34,6 +40,6 @@ func (t *taskUseCase) RegisterNewTask(payload model.Task) (model.Task, error) {
 	return task, nil
 }
 
-func NewTaskUseCase(repo repository.TaskRepository) TaskUseCase {
-	return &taskUseCase{repo: repo}
+func NewTaskUseCase(repo repository.TaskRepository, authorUC AuthorUseCase) TaskUseCase {
+	return &taskUseCase{repo: repo, authorUC: authorUC}
 }
