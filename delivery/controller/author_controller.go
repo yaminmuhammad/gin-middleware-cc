@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gin/config"
 	"gin/usecase"
 	"net/http"
 
@@ -16,19 +17,14 @@ func (a *AuthorController) getHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	author, err := a.authorUC.FindAuthorByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"err": err.Error(),
-		})
+		ctx.JSON(http.StatusNotFound, gin.H{"err": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Ok",
-		"data":    author,
-	})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Ok", "data": author})
 }
 
 func (a *AuthorController) Route() {
-	a.rg.GET("/authors", a.getHandler)
+	a.rg.GET(config.AuthorGetById, a.getHandler)
 }
 
 func NewAuthorController(authorUC usecase.AuthorUseCase, rg *gin.RouterGroup) *AuthorController {

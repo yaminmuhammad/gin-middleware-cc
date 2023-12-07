@@ -10,11 +10,21 @@ import (
 type TaskUseCase interface {
 	FindAllTask() ([]model.Task, error)
 	RegisterNewTask(payload model.Task) (model.Task, error)
+	FindTaskByAuthorID(authorID string) ([]model.Task, error)
 }
 
 type taskUseCase struct {
 	repo     repository.TaskRepository
 	authorUC AuthorUseCase
+}
+
+// FindTaskByAuthorID implements TaskUseCase.
+func (t *taskUseCase) FindTaskByAuthorID(authorID string) ([]model.Task, error) {
+	tasks, err := t.repo.GetByAuthor(authorID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find tasks for author with ID %s: %v", authorID, err)
+	}
+	return tasks, nil
 }
 
 func (t *taskUseCase) FindAllTask() ([]model.Task, error) {

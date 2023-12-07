@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"gin/config"
 	"gin/model"
+	"log"
 )
 
 // TODO:
@@ -16,16 +17,47 @@ import (
 type TaskRepository interface {
 	List() ([]model.Task, error)
 	Create(payload model.Task) (model.Task, error)
+	GetByAuthor(id string) ([]model.Task, error)
 }
 
 type taskRepository struct {
 	db *sql.DB
 }
 
+// GetByAuthor implements TaskRepository.
+func (t *taskRepository) GetByAuthor(id string) ([]model.Task, error) {
+	var tasks []model.Task
+	rows, err := t.db.Query(config.SelectTaskByAuthorID, id)
+	if err != nil {
+		log.Println("taskRepository.Query:", err.Error())
+		return nil, err
+	}
+	for rows.Next() {
+		var task model.Task
+		err := rows.Scan(
+			&task.ID,
+			&task.Title,
+			&task.Content,
+			&task.AuthorId,
+			&task.CreatedAt,
+			&task.UpdatedAt,
+		)
+		if err != nil {
+			log.Println("taskRepository.Rows.Next():", err.Error())
+			return nil, err
+		}
+
+		tasks = append(tasks, task)
+	}
+	return tasks, nil
+
+}
+
 func (t *taskRepository) List() ([]model.Task, error) {
 	var tasks []model.Task
 	rows, err := t.db.Query(config.SelectTaskList)
 	if err != nil {
+		log.Println("taskRepository.Query:", err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -38,6 +70,7 @@ func (t *taskRepository) List() ([]model.Task, error) {
 			&task.UpdatedAt,
 		)
 		if err != nil {
+			log.Println("taskRepository.Rows.Next():", err.Error())
 			return nil, err
 		}
 

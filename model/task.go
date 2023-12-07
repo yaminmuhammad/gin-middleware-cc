@@ -6,7 +6,7 @@ type Task struct {
 	ID        string    `json:"id"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
-	AuthorId  string    `json:"authorId"`
+	AuthorId  string    `json:"authorId,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
