@@ -10,7 +10,7 @@ const (
 	AuthorUpdate  = "/authors"
 
 	TaskGetList = "/tasks"
-	TaskGetById = "/tasks/:id"
+	TaskGetById = "/tasks/:authorId"
 	TaskPost    = "/tasks"
 	TaskDelete  = "/tasks/:id"
 	TaskUpdate  = "/tasks"

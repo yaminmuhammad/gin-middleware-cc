@@ -29,7 +29,7 @@ func (t *TaskController) createHandler(ctx *gin.Context) {
 }
 
 func (t *TaskController) getByAuthorHandler(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("authorId")
 	tasks, err := t.taskUC.FindTaskByAuthorID(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
