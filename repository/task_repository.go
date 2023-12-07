@@ -61,6 +61,7 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 	}
 	task.Title = payload.Title
 	task.Content = payload.Content
+	task.AuthorId = payload.AuthorId
 	task.UpdatedAt = payload.UpdatedAt
 	return task, nil
 }
