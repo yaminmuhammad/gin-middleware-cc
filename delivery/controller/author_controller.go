@@ -2,6 +2,7 @@ package controller
 
 import (
 	"gin/config"
+	"gin/shared/common"
 	"gin/usecase"
 	"net/http"
 
@@ -16,20 +17,24 @@ type AuthorController struct {
 func (a *AuthorController) listHandler(ctx *gin.Context) {
 	authors, err := a.authorUC.FindAllAuthor()
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"err": err.Error()})
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Ok", "data": authors})
+	var response []interface{}
+	for _, v := range authors {
+		response = append(response, v)
+	}
+	common.SendPagedResponse(ctx, response, "Ok")
 }
 
 func (a *AuthorController) getHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	author, err := a.authorUC.FindAuthorByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"err": err.Error()})
+		common.SendErrorResponse(ctx, http.StatusNotFound, "author with ID "+id+" not found")
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Ok", "data": author})
+	common.SendSingleResponse(ctx, author, "Ok")
 }
 
 func (a *AuthorController) Route() {

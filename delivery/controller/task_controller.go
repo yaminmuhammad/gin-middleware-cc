@@ -3,6 +3,7 @@ package controller
 import (
 	"gin/config"
 	"gin/model"
+	"gin/shared/common"
 	"gin/usecase"
 	"net/http"
 
@@ -17,34 +18,38 @@ type TaskController struct {
 func (t *TaskController) createHandler(ctx *gin.Context) {
 	var payload model.Task
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	task, err := t.taskUC.RegisterNewTask(payload)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{"message": "Ok", "data": task})
+	common.SendCreateResponse(ctx, task, "Created")
 }
 
 func (t *TaskController) listHandler(ctx *gin.Context) {
 	tasks, err := t.taskUC.FindAllTask()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Ok", "data": tasks})
+	var response []interface{}
+	for _, v := range tasks {
+		response = append(response, v)
+	}
+	common.SendPagedResponse(ctx, response, "Ok")
 }
 
 func (t *TaskController) getByAuthorHandler(ctx *gin.Context) {
 	author := ctx.Param("author")
 	tasks, err := t.taskUC.FindTaskByAuthor(author)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"err": err.Error()})
+		common.SendErrorResponse(ctx, http.StatusNotFound, "task with author ID "+author+" not found")
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Ok", "data": tasks})
+	common.SendSingleResponse(ctx, tasks, "Ok")
 }
 
 func (t *TaskController) Route() {
