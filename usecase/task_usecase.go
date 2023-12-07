@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"gin/model"
 	"gin/repository"
+	"gin/shared/shared_model"
 	"time"
 )
 
 type TaskUseCase interface {
-	FindAllTask() ([]model.Task, error)
+	FindAllTask(page, size int) ([]model.Task, shared_model.Paging, error)
 	FindTaskByAuthor(author string) ([]model.Task, error)
 	RegisterNewTask(payload model.Task) (model.Task, error)
 }
@@ -22,8 +23,8 @@ func (t *taskUseCase) FindTaskByAuthor(author string) ([]model.Task, error) {
 	return t.repo.GetByAuthor(author)
 }
 
-func (t *taskUseCase) FindAllTask() ([]model.Task, error) {
-	return t.repo.List()
+func (t *taskUseCase) FindAllTask(page, size int) ([]model.Task, shared_model.Paging, error) {
+	return t.repo.List(page, size)
 }
 
 func (t *taskUseCase) RegisterNewTask(payload model.Task) (model.Task, error) {

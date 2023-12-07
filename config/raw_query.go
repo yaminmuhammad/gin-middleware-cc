@@ -1,7 +1,7 @@
 package config
 
 const (
-	SelectTaskList       = `SELECT id, title, content, author_id, created_at, updated_at FROM tasks ORDER BY created_at desc`
+	SelectTaskList       = `SELECT id, title, content, author_id, created_at, updated_at FROM tasks ORDER BY created_at DESC LIMIT $1 OFFSET $2`
 	InsertTask           = `INSERT INTO tasks (title, content, author_id, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, created_at`
 	SelectTaskByAuthorID = `SELECT id, title, content, author_id, created_at, updated_at FROM tasks WHERE author_id = $1 ORDER BY created_at DESC`
 

@@ -3,6 +3,7 @@ package controller
 import (
 	"gin/config"
 	"gin/shared/common"
+	"gin/shared/shared_model"
 	"gin/usecase"
 	"net/http"
 
@@ -24,7 +25,7 @@ func (a *AuthorController) listHandler(ctx *gin.Context) {
 	for _, v := range authors {
 		response = append(response, v)
 	}
-	common.SendPagedResponse(ctx, response, "Ok")
+	common.SendPagedResponse(ctx, response, shared_model.Paging{}, "Ok")
 }
 
 func (a *AuthorController) getHandler(ctx *gin.Context) {

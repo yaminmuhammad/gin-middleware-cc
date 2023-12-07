@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"gin/config"
 	"gin/model"
+	"gin/shared/shared_model"
 	"log"
+	"math"
 )
 
 // TODO:
@@ -14,8 +16,9 @@ import (
 2. Method (v) -> implementasi dari interface
 3. Function (v) -> constructor (gerbang penghubung)
 */
+
 type TaskRepository interface {
-	List() ([]model.Task, error)
+	List(page, size int) ([]model.Task, shared_model.Paging, error)
 	Create(payload model.Task) (model.Task, error)
 	GetByAuthor(authorId string) ([]model.Task, error)
 }
@@ -50,12 +53,13 @@ func (t *taskRepository) GetByAuthor(authorId string) ([]model.Task, error) {
 	return tasks, nil
 }
 
-func (t *taskRepository) List() ([]model.Task, error) {
+func (t *taskRepository) List(page, size int) ([]model.Task, shared_model.Paging, error) {
 	var tasks []model.Task
-	rows, err := t.db.Query(config.SelectTaskList)
+	offset := (page - 1) * size
+	rows, err := t.db.Query(config.SelectTaskList, size, offset)
 	if err != nil {
 		log.Println("taskRepository.Query:", err.Error())
-		return nil, err
+		return nil, shared_model.Paging{}, err
 	}
 	for rows.Next() {
 		var task model.Task
@@ -69,12 +73,24 @@ func (t *taskRepository) List() ([]model.Task, error) {
 		)
 		if err != nil {
 			log.Println("taskRepository.Rows.Next():", err.Error())
-			return nil, err
+			return nil, shared_model.Paging{}, err
 		}
 
 		tasks = append(tasks, task)
 	}
-	return tasks, nil
+
+	totalRows := 0
+	if err := t.db.QueryRow("SELECT COUNT(*) FROM tasks").Scan(&totalRows); err != nil {
+		return nil, shared_model.Paging{}, err
+	}
+
+	paging := shared_model.Paging{
+		Page:        page,
+		RowsPerPage: size,
+		TotalRows:   totalRows,
+		TotalPages:  int(math.Ceil(float64(totalRows) / float64(size))),
+	}
+	return tasks, paging, nil
 }
 
 func (t *taskRepository) Create(payload model.Task) (model.Task, error) {

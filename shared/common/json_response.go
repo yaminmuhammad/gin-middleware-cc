@@ -27,14 +27,14 @@ func SendSingleResponse(ctx *gin.Context, data interface{}, message string) {
 	})
 }
 
-func SendPagedResponse(ctx *gin.Context, data []interface{}, message string) {
+func SendPagedResponse(ctx *gin.Context, data []interface{}, paging shared_model.Paging, message string) {
 	ctx.JSON(http.StatusOK, &shared_model.PagedResponse{
 		Status: shared_model.Status{
 			Code:    http.StatusOK,
 			Message: message,
 		},
 		Data:   data,
-		Paging: nil,
+		Paging: paging,
 	})
 }
 

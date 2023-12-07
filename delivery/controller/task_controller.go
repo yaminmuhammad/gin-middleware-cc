@@ -6,6 +6,7 @@ import (
 	"gin/shared/common"
 	"gin/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,7 +31,9 @@ func (t *TaskController) createHandler(ctx *gin.Context) {
 }
 
 func (t *TaskController) listHandler(ctx *gin.Context) {
-	tasks, err := t.taskUC.FindAllTask()
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	size, _ := strconv.Atoi(ctx.Query("size"))
+	tasks, paging, err := t.taskUC.FindAllTask(page, size)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -39,7 +42,7 @@ func (t *TaskController) listHandler(ctx *gin.Context) {
 	for _, v := range tasks {
 		response = append(response, v)
 	}
-	common.SendPagedResponse(ctx, response, "Ok")
+	common.SendPagedResponse(ctx, response, paging, "Ok")
 }
 
 func (t *TaskController) getByAuthorHandler(ctx *gin.Context) {
