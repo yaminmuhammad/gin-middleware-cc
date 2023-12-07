@@ -9,8 +9,8 @@ import (
 
 type TaskUseCase interface {
 	FindAllTask() ([]model.Task, error)
+	FindTaskByAuthor(author string) ([]model.Task, error)
 	RegisterNewTask(payload model.Task) (model.Task, error)
-	FindTaskByAuthorID(authorID string) ([]model.Task, error)
 }
 
 type taskUseCase struct {
@@ -18,13 +18,8 @@ type taskUseCase struct {
 	authorUC AuthorUseCase
 }
 
-// FindTaskByAuthorID implements TaskUseCase.
-func (t *taskUseCase) FindTaskByAuthorID(authorID string) ([]model.Task, error) {
-	tasks, err := t.repo.GetByAuthor(authorID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find tasks for author with ID %s: %v", authorID, err)
-	}
-	return tasks, nil
+func (t *taskUseCase) FindTaskByAuthor(author string) ([]model.Task, error) {
+	return t.repo.GetByAuthor(author)
 }
 
 func (t *taskUseCase) FindAllTask() ([]model.Task, error) {
@@ -32,13 +27,10 @@ func (t *taskUseCase) FindAllTask() ([]model.Task, error) {
 }
 
 func (t *taskUseCase) RegisterNewTask(payload model.Task) (model.Task, error) {
-	fmt.Println("payload.AuthorID:", payload.AuthorId)
-	author, err := t.authorUC.FindAuthorByID(payload.AuthorId)
-	fmt.Println("author:", author)
+	_, err := t.authorUC.FindAuthorByID(payload.AuthorId)
 	if err != nil {
 		return model.Task{}, fmt.Errorf("author with ID %s not found", payload.AuthorId)
 	}
-
 	if payload.Title == "" || payload.Content == "" {
 		return model.Task{}, fmt.Errorf("oppps, required fields")
 	}

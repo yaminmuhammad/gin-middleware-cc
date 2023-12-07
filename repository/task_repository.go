@@ -17,19 +17,18 @@ import (
 type TaskRepository interface {
 	List() ([]model.Task, error)
 	Create(payload model.Task) (model.Task, error)
-	GetByAuthor(id string) ([]model.Task, error)
+	GetByAuthor(authorId string) ([]model.Task, error)
 }
 
 type taskRepository struct {
 	db *sql.DB
 }
 
-// GetByAuthor implements TaskRepository.
-func (t *taskRepository) GetByAuthor(id string) ([]model.Task, error) {
+func (t *taskRepository) GetByAuthor(authorId string) ([]model.Task, error) {
 	var tasks []model.Task
-	rows, err := t.db.Query(config.SelectTaskByAuthorID, id)
+	rows, err := t.db.Query(config.SelectTaskByAuthorID, authorId)
 	if err != nil {
-		log.Println("taskRepository.Query:", err.Error())
+		log.Println("taskRepository.GetByAuthor.Query:", err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -43,14 +42,12 @@ func (t *taskRepository) GetByAuthor(id string) ([]model.Task, error) {
 			&task.UpdatedAt,
 		)
 		if err != nil {
-			log.Println("taskRepository.Rows.Next():", err.Error())
+			log.Println("taskRepository.GetByAuthor.Rows:", err.Error())
 			return nil, err
 		}
-
 		tasks = append(tasks, task)
 	}
 	return tasks, nil
-
 }
 
 func (t *taskRepository) List() ([]model.Task, error) {
@@ -66,6 +63,7 @@ func (t *taskRepository) List() ([]model.Task, error) {
 			&task.ID,
 			&task.Title,
 			&task.Content,
+			&task.AuthorId,
 			&task.CreatedAt,
 			&task.UpdatedAt,
 		)
@@ -90,6 +88,7 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 		&task.CreatedAt,
 	)
 	if err != nil {
+		log.Println("taskRepository.QueryRow:", err.Error())
 		return model.Task{}, err
 	}
 	task.Title = payload.Title

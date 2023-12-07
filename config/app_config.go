@@ -9,9 +9,10 @@ const (
 	AuthorDelete  = "/authors/:id"
 	AuthorUpdate  = "/authors"
 
-	TaskGetList = "/tasks"
-	TaskGetById = "/tasks/:authorId"
-	TaskPost    = "/tasks"
-	TaskDelete  = "/tasks/:id"
-	TaskUpdate  = "/tasks"
+	TaskGetList     = "/tasks"
+	TaskGetById     = "/tasks/:id"
+	TaskPost        = "/tasks"
+	TaskDelete      = "/tasks/:id"
+	TaskUpdate      = "/tasks"
+	TaskGetByAuthor = "/tasks/:author"
 )

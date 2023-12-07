@@ -47,7 +47,7 @@ func NewServer() *Server {
 	authUC := usecase.NewAuthorUseCase(authorRepo)
 	taskUC := usecase.NewTaskUseCase(taskRepo, authUC)
 	engine := gin.Default()
-	host := fmt.Sprintf(":%s", cfg.ApiHost)
+	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	return &Server{
 		authorUc: authUC,
 		taskUc:   taskUC,
